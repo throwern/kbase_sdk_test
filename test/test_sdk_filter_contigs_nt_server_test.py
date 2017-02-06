@@ -95,7 +95,9 @@ class test_sdk_filter_contigs_ntTest(unittest.TestCase):
                         '>seq2\n' \
                         'agctt\n' \
                         '>seq3\n' \
-                        'agcttttcatgg'
+                        'agcttttcatgg\n' \
+                        '>seq4\n' \
+                        'agcttttcatagcttttcatgg'
 
         assembly_ref = self.load_fasta_file(os.path.join(self.scratch, 'test1.fasta'),
                                             'TestAssembly',
@@ -105,12 +107,13 @@ class test_sdk_filter_contigs_ntTest(unittest.TestCase):
         ret = self.getImpl().filter_contigs(self.getContext(),
                                             {'workspace_name': self.getWsName(),
                                              'assembly_input_ref': assembly_ref,
-                                             'min_length': 10
+                                             'min_length': 10,
+                                             'max_length': 20,
                                              })
 
         # Validate the returned data
-        self.assertEqual(ret[0]['n_initial_contigs'], 3)
-        self.assertEqual(ret[0]['n_contigs_removed'], 1)
+        self.assertEqual(ret[0]['n_initial_contigs'], 4)
+        self.assertEqual(ret[0]['n_contigs_removed'], 2)
         self.assertEqual(ret[0]['n_contigs_remaining'], 2)
 
     def test_filter_contigs_err1(self):
@@ -118,6 +121,7 @@ class test_sdk_filter_contigs_ntTest(unittest.TestCase):
             self.getImpl().filter_contigs(self.getContext(),
                                           {'workspace_name': self.getWsName(),
                                            'assembly_input_ref': '1/fake/3',
+                                           'max_length': '10',
                                            'min_length': '-10'})
         self.assertIn('min_length parameter cannot be negative', str(errorContext.exception))
 

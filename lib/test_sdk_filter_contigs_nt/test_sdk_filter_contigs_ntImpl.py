@@ -13,25 +13,26 @@ class test_sdk_filter_contigs_nt:
     '''
     Module Name:
     test_sdk_filter_contigs_nt
+
     Module Description:
-    
+    A KBase module: test_sdk_filter_contigs_nt
+This sample module contains one small method - filter_contigs.
     '''
-    
-    ######## WARNING FOR GEVENT USERS #######
+
+    ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
     # interrupting each other, you must be *very* careful when using global
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
-    #########################################
-
+    ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = ""
-    GIT_COMMIT_HASH = ""
-    
+    GIT_URL = "https://github.com/throwern/kbase_sdk_test.git"
+    GIT_COMMIT_HASH = "d9b0e7c2570881b1e5d94ead55884d1008373903"
+
     #BEGIN_CLASS_HEADER
     # Class variables and functions can be defined in this block
     #END_CLASS_HEADER
-    
+
     # config contains contents of config file in a hash or None if it couldn't
     # be found
     def __init__(self, config):
@@ -45,9 +46,46 @@ class test_sdk_filter_contigs_nt:
         #END_CONSTRUCTOR
         pass
 
+
     def filter_contigs(self, ctx, params):
+        """
+        The actual function is declared using 'funcdef' to specify the name
+        and input/return arguments to the function.  For all typical KBase
+        Apps that run in the Narrative, your function should have the 
+        'authentication required' modifier.
+        :param params: instance of type "FilterContigsParams" (A 'typedef'
+           can also be used to define compound or container objects, like
+           lists, maps, and structures.  The standard KBase convention is to
+           use structures, as shown here, to define the input and output of
+           your function.  Here the input is a reference to the Assembly data
+           object, a workspace to save output, and a length threshold for
+           filtering. To define lists and maps, use a syntax similar to C++
+           templates to indicate the type contained in the list or map.  For
+           example: list <string> list_of_strings; mapping <string, int>
+           map_of_ints;) -> structure: parameter "assembly_input_ref" of type
+           "assembly_ref" (A 'typedef' allows you to provide a more specific
+           name for a type.  Built-in primitive types include 'string',
+           'int', 'float'.  Here we define a type named assembly_ref to
+           indicate a string that should be set to a KBase ID reference to an
+           Assembly data object.), parameter "workspace_name" of String,
+           parameter "min_length" of Long, parameter "max_length" of Long
+        :returns: instance of type "FilterContigsResults" (Here is the
+           definition of the output of the function.  The output can be used
+           by other SDK modules which call your code, or the output
+           visualizations in the Narrative.  'report_name' and 'report_ref'
+           are special output fields- if defined, the Narrative can
+           automatically render your Report.) -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String,
+           parameter "assembly_output" of type "assembly_ref" (A 'typedef'
+           allows you to provide a more specific name for a type.  Built-in
+           primitive types include 'string', 'int', 'float'.  Here we define
+           a type named assembly_ref to indicate a string that should be set
+           to a KBase ID reference to an Assembly data object.), parameter
+           "n_initial_contigs" of Long, parameter "n_contigs_removed" of
+           Long, parameter "n_contigs_remaining" of Long
+        """
         # ctx is the context object
-        # return variables are: returnVal
+        # return variables are: output
         #BEGIN filter_contigs
 
         # Print statements to stdout/stderr are captured and available as the App log
@@ -74,8 +112,16 @@ class test_sdk_filter_contigs_nt:
             min_length = int(min_length_orig)
         except ValueError:
             raise ValueError('Cannot parse integer from min_length parameter (' + str(min_length_orig) + ')')
-        if min_length < 0:
-            raise ValueError('min_length parameter cannot be negative (' + str(min_length) + ')')
+        if 'max_length' not in params:
+            raise ValueError('Parameter max_length is not set in input arguments')
+        max_length_orig = params['max_length']
+        max_length = None
+        try:
+            max_length = int(max_length_orig)
+        except ValueError:
+            raise ValueError('Cannot parse integer from max_length parameter (' + str(max_length_orig) + ')')
+        if max_length < 0:
+            raise ValueError('max_length parameter cannot be negative (' + str(max_length) + ')')
 
 
         # Step 2 - Download the input data as a Fasta and
@@ -93,7 +139,7 @@ class test_sdk_filter_contigs_nt:
         n_remaining = 0
         for record in SeqIO.parse(fasta_file['path'], 'fasta'):
             n_total += 1
-            if len(record.seq) >= min_length:
+            if len(record.seq) >= min_length and len(record.seq) <= max_length:
                 good_contigs.append(record)
                 n_remaining += 1
 
@@ -130,7 +176,6 @@ class test_sdk_filter_contigs_nt:
         print('returning:' + pformat(output))
                 
         #END filter_contigs
-        
 
         # At some point might do deeper type checking...
         if not isinstance(output, dict):
@@ -138,7 +183,6 @@ class test_sdk_filter_contigs_nt:
                              'output is not type dict as required.')
         # return the results
         return [output]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

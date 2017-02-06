@@ -2,7 +2,8 @@ module-name:
     test_sdk_filter_contigs_nt
 
 module-description:
-    A KBase module
+    A KBase module with an updated description. This is an example.
+    From the sdk tutorial
 
 service-language:
     python
