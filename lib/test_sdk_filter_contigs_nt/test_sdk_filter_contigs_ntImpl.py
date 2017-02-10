@@ -112,6 +112,8 @@ This sample module contains one small method - filter_contigs.
             min_length = int(min_length_orig)
         except ValueError:
             raise ValueError('Cannot parse integer from min_length parameter (' + str(min_length_orig) + ')')
+        if min_length < 0:
+            raise ValueError('min_length parameter cannot be negative (' + str(min_length) + ')')
         if 'max_length' not in params:
             raise ValueError('Parameter max_length is not set in input arguments')
         max_length_orig = params['max_length']

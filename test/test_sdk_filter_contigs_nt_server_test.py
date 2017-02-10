@@ -116,19 +116,19 @@ class test_sdk_filter_contigs_ntTest(unittest.TestCase):
         self.assertEqual(ret[0]['n_contigs_removed'], 2)
         self.assertEqual(ret[0]['n_contigs_remaining'], 2)
 
-    # def test_filter_contigs_err1(self):
-    #     with self.assertRaises(ValueError) as errorContext:
-    #         self.getImpl().filter_contigs(self.getContext(),
-    #                                       {'workspace_name': self.getWsName(),
-    #                                        'assembly_input_ref': '1/fake/3',
-    #                                        'max_length': '10',
-    #                                        'min_length': '-10'})
-    #     self.assertIn('min_length parameter cannot be negative', str(errorContext.exception))
-    #
-    # def test_filter_contigs_err2(self):
-    #     with self.assertRaises(ValueError) as errorContext:
-    #         self.getImpl().filter_contigs(self.getContext(),
-    #                                       {'workspace_name': self.getWsName(),
-    #                                        'assembly_input_ref': '1/fake/3',
-    #                                        'min_length': 'ten'})
-    #     self.assertIn('Cannot parse integer from min_length parameter', str(errorContext.exception))
+    def test_filter_contigs_err1(self):
+        with self.assertRaises(ValueError) as errorContext:
+            self.getImpl().filter_contigs(self.getContext(),
+                                          {'workspace_name': self.getWsName(),
+                                           'assembly_input_ref': '1/fake/3',
+                                           'max_length': '10',
+                                           'min_length': '-10'})
+        self.assertIn('min_length parameter cannot be negative', str(errorContext.exception))
+    
+    def test_filter_contigs_err2(self):
+        with self.assertRaises(ValueError) as errorContext:
+            self.getImpl().filter_contigs(self.getContext(),
+                                          {'workspace_name': self.getWsName(),
+                                           'assembly_input_ref': '1/fake/3',
+                                           'min_length': 'ten'})
+        self.assertIn('Cannot parse integer from min_length parameter', str(errorContext.exception))
